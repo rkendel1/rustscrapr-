@@ -71,6 +71,25 @@ export function ResultTabs({ result }: ResultTabsProps) {
             </div>
 
             <div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                Email Addresses ({page.emails?.length || 0})
+              </h3>
+              {page.emails && page.emails.length > 0 ? (
+                <ul className="space-y-1">
+                  {page.emails.map((email, i) => (
+                    <li key={i} className="text-slate-700">
+                      <a href={`mailto:${email}`} className="text-blue-600 hover:underline">
+                        {email}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-slate-500">No email addresses found</p>
+              )}
+            </div>
+
+            <div>
               <h3 className="text-lg font-semibold text-slate-900 mb-2">Text Content Preview</h3>
               <p className="text-slate-700 line-clamp-6">
                 {page.textContent.substring(0, 500)}...

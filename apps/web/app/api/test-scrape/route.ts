@@ -128,6 +128,14 @@ const SAMPLE_HTML = `
       <li><a href="https://twitter.com/example">Twitter</a></li>
       <li><a href="https://linkedin.com/company/example">LinkedIn</a></li>
     </ul>
+    
+    <h2>Contact Us</h2>
+    <p>Have questions? Reach out to our team:</p>
+    <ul>
+      <li>General Inquiries: <a href="mailto:info@example.com">info@example.com</a></li>
+      <li>Sales: <a href="mailto:sales@example.com">sales@example.com</a></li>
+      <li>Support: support@example.com</li>
+    </ul>
   </main>
   
   <footer>

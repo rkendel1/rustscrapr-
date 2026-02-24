@@ -29,6 +29,7 @@ pub struct PageData {
     meta_description: String,
     headings: Vec<String>,
     text_content: String,
+    emails: Vec<String>,
     links: LinkData,
     design_tokens: Option<DesignTokens>,
     assets: AssetData,
@@ -222,7 +223,7 @@ pub async fn scrape(html: String, base_url: String, config: JsValue) -> Result<J
 fn parse_page(html: &str, base_url: &str, config: &ScraperConfig) -> Result<PageData, JsValue> {
     let document = scraper::Html::parse_document(html);
     
-    let (title, meta_description, headings, text_content) = extract_text(&document);
+    let (title, meta_description, headings, text_content, emails) = extract_text(&document);
     let links = extract_links(&document, base_url)?;
     let design_tokens = if config.extract_design_tokens.unwrap_or(true) {
         Some(extract_design_tokens(&document)?)
@@ -237,6 +238,7 @@ fn parse_page(html: &str, base_url: &str, config: &ScraperConfig) -> Result<Page
         meta_description,
         headings,
         text_content,
+        emails,
         links,
         design_tokens,
         assets,
