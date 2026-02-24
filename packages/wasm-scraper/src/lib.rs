@@ -106,7 +106,7 @@ fn parse_page(html: &str, base_url: &str, config: &ScraperConfig) -> Result<Page
     let (title, meta_description, headings, text_content) = extract_text(&document);
     let links = extract_links(&document, base_url)?;
     let design_tokens = if config.extract_design_tokens.unwrap_or(true) {
-        Some(extract_design_tokens(&document, html)?)
+        Some(extract_design_tokens(&document)?)
     } else {
         None
     };

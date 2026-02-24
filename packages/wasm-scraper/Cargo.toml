@@ -20,6 +20,7 @@ js-sys = "0.3"
 web-sys = "0.3"
 regex = "1"
 serde-wasm-bindgen = "0.6"
+once_cell = "1"
 
 # Explicitly add both getrandom versions with proper features
 getrandom = { version = "0.2", features = ["js"] }
@@ -27,7 +28,7 @@ getrandom = { version = "0.2", features = ["js"] }
 # Override ahash to use the version that requires getrandom 0.3 with wasm_js feature
 ahash = { version = "0.8", default-features = false, features = ["getrandom"] }
 
-[dependencies.getrandom03]
+[dependencies.getrandom_v03]
 package = "getrandom"
 version = "0.3"
 features = ["wasm_js"]

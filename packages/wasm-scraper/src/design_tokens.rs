@@ -3,8 +3,42 @@ use scraper::{Html, Selector};
 use regex::Regex;
 use std::collections::HashMap;
 use wasm_bindgen::JsValue;
+use once_cell::sync::Lazy;
 
-pub fn extract_design_tokens(document: &Html, _html: &str) -> Result<DesignTokens, JsValue> {
+// Pre-compiled regex patterns for better performance
+static HEX_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})(?:[^0-9a-fA-F]|$)").unwrap()
+});
+
+static RGB_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"rgba?\([^)]+\)").unwrap()
+});
+
+static HSL_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"hsla?\([^)]+\)").unwrap()
+});
+
+static FONT_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"font-family:\s*([^;]+)").unwrap()
+});
+
+static SIZE_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"font-size:\s*([^;]+)").unwrap()
+});
+
+static SPACING_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"(?:margin|padding):\s*([^;]+)").unwrap()
+});
+
+static RADIUS_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"border-radius:\s*([^;]+)").unwrap()
+});
+
+static SHADOW_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"box-shadow:\s*([^;]+)").unwrap()
+});
+
+pub fn extract_design_tokens(document: &Html) -> Result<DesignTokens, JsValue> {
     let mut tokens = DesignTokens::default();
     
     // Extract from style tags
@@ -50,8 +84,7 @@ fn extract_colors(css: &str) -> Vec<ColorToken> {
     let mut color_counts: HashMap<String, usize> = HashMap::new();
     
     // Hex colors
-    let hex_regex = Regex::new(r"#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})(?:[^0-9a-fA-F]|$)").unwrap();
-    for cap in hex_regex.captures_iter(css) {
+    for cap in HEX_REGEX.captures_iter(css) {
         if let Some(color) = cap.get(0) {
             let color_str = color.as_str().trim_end_matches(|c: char| !c.is_ascii_hexdigit() && c != '#').to_lowercase();
             *color_counts.entry(color_str).or_insert(0) += 1;
@@ -59,15 +92,13 @@ fn extract_colors(css: &str) -> Vec<ColorToken> {
     }
     
     // RGB/RGBA
-    let rgb_regex = Regex::new(r"rgba?\([^)]+\)").unwrap();
-    for cap in rgb_regex.captures_iter(css) {
+    for cap in RGB_REGEX.captures_iter(css) {
         let color_str = cap.get(0).unwrap().as_str().to_string();
         *color_counts.entry(color_str).or_insert(0) += 1;
     }
     
     // HSL/HSLA
-    let hsl_regex = Regex::new(r"hsla?\([^)]+\)").unwrap();
-    for cap in hsl_regex.captures_iter(css) {
+    for cap in HSL_REGEX.captures_iter(css) {
         let color_str = cap.get(0).unwrap().as_str().to_string();
         *color_counts.entry(color_str).or_insert(0) += 1;
     }
@@ -87,10 +118,9 @@ fn extract_colors(css: &str) -> Vec<ColorToken> {
 }
 
 fn extract_font_families(css: &str) -> Vec<String> {
-    let font_regex = Regex::new(r"font-family:\s*([^;]+)").unwrap();
     let mut families = Vec::new();
     
-    for cap in font_regex.captures_iter(css) {
+    for cap in FONT_REGEX.captures_iter(css) {
         if let Some(family) = cap.get(1) {
             let family_str = family.as_str().trim().to_string();
             if !families.contains(&family_str) {
@@ -104,10 +134,9 @@ fn extract_font_families(css: &str) -> Vec<String> {
 }
 
 fn extract_font_sizes(css: &str) -> Vec<String> {
-    let size_regex = Regex::new(r"font-size:\s*([^;]+)").unwrap();
     let mut sizes = Vec::new();
     
-    for cap in size_regex.captures_iter(css) {
+    for cap in SIZE_REGEX.captures_iter(css) {
         if let Some(size) = cap.get(1) {
             let size_str = size.as_str().trim().to_string();
             if !sizes.contains(&size_str) {
@@ -121,10 +150,9 @@ fn extract_font_sizes(css: &str) -> Vec<String> {
 }
 
 fn extract_spacing(css: &str) -> Vec<String> {
-    let spacing_regex = Regex::new(r"(?:margin|padding):\s*([^;]+)").unwrap();
     let mut spacing = Vec::new();
     
-    for cap in spacing_regex.captures_iter(css) {
+    for cap in SPACING_REGEX.captures_iter(css) {
         if let Some(value) = cap.get(1) {
             let value_str = value.as_str().trim().to_string();
             if !spacing.contains(&value_str) {
@@ -138,10 +166,9 @@ fn extract_spacing(css: &str) -> Vec<String> {
 }
 
 fn extract_border_radius(css: &str) -> Vec<String> {
-    let radius_regex = Regex::new(r"border-radius:\s*([^;]+)").unwrap();
     let mut radii = Vec::new();
     
-    for cap in radius_regex.captures_iter(css) {
+    for cap in RADIUS_REGEX.captures_iter(css) {
         if let Some(radius) = cap.get(1) {
             let radius_str = radius.as_str().trim().to_string();
             if !radii.contains(&radius_str) {
@@ -155,10 +182,9 @@ fn extract_border_radius(css: &str) -> Vec<String> {
 }
 
 fn extract_shadows(css: &str) -> Vec<String> {
-    let shadow_regex = Regex::new(r"box-shadow:\s*([^;]+)").unwrap();
     let mut shadows = Vec::new();
     
-    for cap in shadow_regex.captures_iter(css) {
+    for cap in SHADOW_REGEX.captures_iter(css) {
         if let Some(shadow) = cap.get(1) {
             let shadow_str = shadow.as_str().trim().to_string();
             if !shadows.contains(&shadow_str) {
