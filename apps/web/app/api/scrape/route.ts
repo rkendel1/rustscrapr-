@@ -62,12 +62,15 @@ export async function POST(request: NextRequest) {
         await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
       } catch (error) {
         // If domcontentloaded fails, try with just 'load'
-        console.warn('domcontentloaded failed, retrying with load:', error);
+        console.warn(`domcontentloaded failed for ${url}, retrying with load:`, error);
         await page.goto(url, { waitUntil: 'load', timeout: 90000 });
       }
       
-      // Wait a bit for dynamic content to load
-      await page.waitForTimeout(2000);
+      // Wait for body element to ensure page is loaded
+      await page.waitForSelector('body', { timeout: 5000 }).catch(() => {
+        console.warn('Body element not found, continuing anyway');
+      });
+      
       const html = await page.content();
       await browser.close();
 

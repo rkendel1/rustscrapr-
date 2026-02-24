@@ -3,9 +3,9 @@ use regex::Regex;
 use std::collections::HashSet;
 use once_cell::sync::Lazy;
 
-// Email regex pattern
+// Email regex pattern - simplified but more accurate
 static EMAIL_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}").unwrap()
+    Regex::new(r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b").unwrap()
 });
 
 pub fn extract_text(document: &Html) -> (String, String, Vec<String>, String, Vec<String>) {
