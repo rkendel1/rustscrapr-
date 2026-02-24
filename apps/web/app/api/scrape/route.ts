@@ -95,7 +95,7 @@ Description: ${page.metaDescription}
 Key Headlines: ${page.headings.slice(0, 5).join(', ')}
 Text Sample: ${page.textContent.substring(0, 500)}
 
-Available Colors: ${tokens.colors.slice(0, 10).map(c => c.value).join(', ')}
+Available Colors: ${tokens.colors.slice(0, 10).map((c: any) => c.value).join(', ')}
 Available Fonts: ${tokens.fontFamilies.join(', ')}
 
 Provide a JSON response with this exact structure:

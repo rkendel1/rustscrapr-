@@ -9,7 +9,19 @@ This project extracts:
 - **Links**: Internal and external links (normalized)
 - **Design Tokens**: Colors, fonts, spacing, shadows from CSS
 - **Assets**: Logos, images, favicons, OG images
+- **Brand Kit**: Comprehensive brand analysis with AI-powered voice & tone (optional)
 - **AI Analysis**: Brand personality and design system insights (optional)
+
+### 🎨 Brand Kit Feature
+
+The scraper now generates comprehensive brand kits with:
+- **Semantic Color Roles**: Primary, secondary, accent, background, surface, error, warning, success
+- **Text Colors**: Primary, secondary, muted, on-primary
+- **Typography System**: Heading & body fonts with size scale (xs, sm, base, lg, xl, 2xl)
+- **Voice & Tone**: AI-computed brand voice, personality, and example copy
+- **Design Elements**: Border radius, shadows, spacing
+
+See [BRAND_KIT_FEATURE.md](./BRAND_KIT_FEATURE.md) for detailed documentation.
 
 ### Architecture
 
@@ -112,9 +124,10 @@ cd apps/web && npm run start  # Start production server
    - **AI Brand Analysis**: Generate brand insights (requires API key)
 3. Click "Scrape Website"
 4. View results in tabs:
+   - **Brand Kit**: Complete brand analysis with colors, typography, voice & tone
    - **Content**: Title, meta, headings, text
    - **Links**: Internal and external links
-   - **Design Tokens**: Colors, fonts, spacing, etc.
+   - **Design Tokens**: Raw extracted tokens
    - **Assets**: Images, logos, favicons
 
 ### API Integration
@@ -161,6 +174,37 @@ interface ScraperConfig {
   summarizeBrand?: boolean;   // Default: false
 }
 ```
+
+## 🎨 Brand Kit Generation
+
+The scraper now generates exportable brand kits that match industry standards. Each brand kit includes:
+
+### Semantic Color System
+- **Primary, Secondary, Accent**: Main brand colors
+- **Background, Surface**: Layout colors
+- **Error, Warning, Success**: State colors
+- **Text Colors**: Primary, secondary, muted, on-primary
+
+### Typography System
+- **Font Families**: Heading and body fonts with fallbacks
+- **Font Scale**: xs (12px) → 2xl (36px)
+- **Usage Context**: Automatically categorized
+
+### Voice & Tone (AI-Powered)
+- **Tone**: Brand communication style
+- **Personality**: Brand character traits
+- **Examples**: Sample headlines and CTAs in brand voice
+
+### Design System
+- **Border Radius**: default, lg, full
+- **Shadows**: default, md, lg
+- **Spacing**: Standardized spacing values
+
+Export format matches popular design tools and can be used for:
+- Design system documentation
+- Figma/Sketch imports
+- Tailwind config generation
+- Brand guidelines
 
 ## 🎨 Design Token Extraction
 
