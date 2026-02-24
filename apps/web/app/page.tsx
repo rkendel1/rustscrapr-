@@ -37,6 +37,33 @@ export default function Home() {
     }
   };
 
+  const handleTestDemo = async (config: any) => {
+    setLoading(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const response = await fetch('/api/test-scrape', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ config }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setResult(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="container mx-auto px-4 py-8">
@@ -51,7 +78,7 @@ export default function Home() {
 
         <div className="grid gap-8">
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <ScraperForm onSubmit={handleScrape} loading={loading} />
+            <ScraperForm onSubmit={handleScrape} onTestDemo={handleTestDemo} loading={loading} />
             
             {error && (
               <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">

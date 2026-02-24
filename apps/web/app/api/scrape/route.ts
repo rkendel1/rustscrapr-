@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import init, { scrape } from 'wasm-scraper';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 
 // Initialize WASM module
 let wasmInitialized = false;
 async function ensureWasmInit() {
   if (!wasmInitialized) {
-    await init();
-    wasmInitialized = true;
+    try {
+      // Load the WASM file directly from the package
+      const wasmPath = join(process.cwd(), '..', '..', 'packages', 'wasm-scraper', 'pkg', 'wasm_scraper_bg.wasm');
+      const wasmBuffer = await readFile(wasmPath);
+      await init(wasmBuffer);
+      wasmInitialized = true;
+    } catch (error) {
+      console.error('Failed to initialize WASM:', error);
+      throw error;
+    }
   }
 }
 

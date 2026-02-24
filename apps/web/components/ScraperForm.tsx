@@ -4,10 +4,11 @@ import { useState } from 'react';
 
 interface ScraperFormProps {
   onSubmit: (url: string, config: any) => void;
+  onTestDemo: (config: any) => void;
   loading: boolean;
 }
 
-export function ScraperForm({ onSubmit, loading }: ScraperFormProps) {
+export function ScraperForm({ onSubmit, onTestDemo, loading }: ScraperFormProps) {
   const [url, setUrl] = useState('');
   const [crawlDepth, setCrawlDepth] = useState(1);
   const [maxPages, setMaxPages] = useState(5);
@@ -25,6 +26,17 @@ export function ScraperForm({ onSubmit, loading }: ScraperFormProps) {
     };
     
     onSubmit(url, config);
+  };
+
+  const handleTestDemo = () => {
+    const config = {
+      crawlDepth,
+      maxPages,
+      extractDesignTokens,
+      summarizeBrand,
+    };
+    
+    onTestDemo(config);
   };
 
   return (
@@ -98,13 +110,24 @@ export function ScraperForm({ onSubmit, loading }: ScraperFormProps) {
         </label>
       </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
-        {loading ? 'Scraping...' : 'Scrape Website'}
-      </button>
+      <div className="flex gap-3">
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {loading ? 'Scraping...' : 'Scrape Website'}
+        </button>
+        
+        <button
+          type="button"
+          onClick={handleTestDemo}
+          disabled={loading}
+          className="bg-green-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          Try Demo
+        </button>
+      </div>
     </form>
   );
 }
