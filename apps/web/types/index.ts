@@ -37,6 +37,7 @@ export interface PageData {
   metaDescription: string;
   headings: string[];
   textContent: string;
+  emails: string[];
   links: LinkData;
   designTokens?: DesignTokens;
   assets: AssetData;

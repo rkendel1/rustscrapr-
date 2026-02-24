@@ -56,7 +56,21 @@ export async function POST(request: NextRequest) {
         'Upgrade-Insecure-Requests': '1',
         'Referer': 'https://www.google.com/',
       });
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
+      // Use a more lenient wait strategy to avoid timeouts
+      // Try domcontentloaded first, then fall back to load
+      try {
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
+      } catch (error) {
+        // If domcontentloaded fails, try with just 'load'
+        console.warn(`domcontentloaded failed for ${url}, retrying with load:`, error);
+        await page.goto(url, { waitUntil: 'load', timeout: 90000 });
+      }
+      
+      // Wait for body element to ensure page is loaded
+      await page.waitForSelector('body', { timeout: 5000 }).catch(() => {
+        console.warn('Body element not found, continuing anyway');
+      });
+      
       const html = await page.content();
       await browser.close();
 

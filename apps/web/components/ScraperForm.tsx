@@ -42,7 +42,7 @@ export function ScraperForm({ onSubmit, onTestDemo, loading }: ScraperFormProps)
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="url" className="block text-sm font-medium text-slate-700 mb-1">
+        <label htmlFor="url" className="block text-sm font-semibold text-slate-900 mb-1">
           Website URL
         </label>
         <input
@@ -52,13 +52,13 @@ export function ScraperForm({ onSubmit, onTestDemo, loading }: ScraperFormProps)
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://example.com"
           required
-          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 placeholder-slate-500"
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="crawlDepth" className="block text-sm font-medium text-slate-700 mb-1">
+          <label htmlFor="crawlDepth" className="block text-sm font-semibold text-slate-900 mb-1">
             Crawl Depth
           </label>
           <input
@@ -68,12 +68,12 @@ export function ScraperForm({ onSubmit, onTestDemo, loading }: ScraperFormProps)
             onChange={(e) => setCrawlDepth(Number(e.target.value))}
             min="1"
             max="3"
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 placeholder-slate-500"
           />
         </div>
 
         <div>
-          <label htmlFor="maxPages" className="block text-sm font-medium text-slate-700 mb-1">
+          <label htmlFor="maxPages" className="block text-sm font-semibold text-slate-900 mb-1">
             Max Pages
           </label>
           <input
@@ -83,7 +83,7 @@ export function ScraperForm({ onSubmit, onTestDemo, loading }: ScraperFormProps)
             onChange={(e) => setMaxPages(Number(e.target.value))}
             min="1"
             max="20"
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 placeholder-slate-500"
           />
         </div>
       </div>

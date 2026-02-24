@@ -1,6 +1,14 @@
 use scraper::{Html, Selector};
+use regex::Regex;
+use std::collections::HashSet;
+use once_cell::sync::Lazy;
 
-pub fn extract_text(document: &Html) -> (String, String, Vec<String>, String) {
+// Email regex pattern - simplified but more accurate
+static EMAIL_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b").unwrap()
+});
+
+pub fn extract_text(document: &Html) -> (String, String, Vec<String>, String, Vec<String>) {
     // Extract title
     let title_selector = Selector::parse("title").unwrap();
     let title = document
@@ -43,5 +51,29 @@ pub fn extract_text(document: &Html) -> (String, String, Vec<String>, String) {
         })
         .unwrap_or_default();
 
-    (title, meta_description, headings, text_content)
+    // Extract emails from text content and href attributes
+    let mut emails = HashSet::new();
+    
+    // Extract from text content
+    for email_match in EMAIL_REGEX.captures_iter(&text_content) {
+        if let Some(email) = email_match.get(0) {
+            emails.insert(email.as_str().to_lowercase());
+        }
+    }
+    
+    // Extract from mailto: links
+    let link_selector = Selector::parse("a[href^='mailto:']").unwrap();
+    for element in document.select(&link_selector) {
+        if let Some(href) = element.value().attr("href") {
+            if let Some(email) = href.strip_prefix("mailto:") {
+                // Remove query parameters if any
+                let clean_email = email.split('?').next().unwrap_or(email);
+                emails.insert(clean_email.to_lowercase());
+            }
+        }
+    }
+    
+    let emails_vec: Vec<String> = emails.into_iter().collect();
+
+    (title, meta_description, headings, text_content, emails_vec)
 }
