@@ -78,20 +78,85 @@ export async function POST(request: NextRequest) {
       await ensureWasmInit();
       const result = await scrape(html, url, config || {});
 
-      // Brand analysis with OpenAI
-      if (process.env.OPENAI_API_KEY) {
+      // Enhanced AI analysis with OpenAI for brand voice and color categorization
+      if (process.env.OPENAI_API_KEY && result.site.designTokens) {
         const OpenAI = (await import('openai')).default;
         const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-        const prompt = `Analyze the following scraped webpage data for brand mentions, key products, and marketing insights: ${JSON.stringify(result)}`;
-        const completion = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [{ role: 'user', content: prompt }],
-        });
-        const analysis = completion.choices[0]?.message?.content || 'No analysis available.';
-        result.brandAnalysis = analysis;
-      } else {
-        result.brandAnalysis = 'OpenAI API key not configured.';
+        const page = result.pages[0];
+        const tokens = result.site.designTokens;
+
+        // Create a concise prompt for AI analysis
+        const analysisPrompt = `Analyze this website and provide brand voice & tone analysis and semantic color categorization.
+
+Website: ${page.title}
+URL: ${page.url}
+Description: ${page.metaDescription}
+Key Headlines: ${page.headings.slice(0, 5).join(', ')}
+Text Sample: ${page.textContent.substring(0, 500)}
+
+Available Colors: ${tokens.colors.slice(0, 10).map(c => c.value).join(', ')}
+Available Fonts: ${tokens.fontFamilies.join(', ')}
+
+Provide a JSON response with this exact structure:
+{
+  "voice": {
+    "tone": "brief tone description (e.g., Professional and reassuring)",
+    "personality": "personality traits (e.g., Confident and knowledgeable)",
+    "examples": {
+      "headline": "example headline in their style",
+      "cta": "example call-to-action button text"
+    }
+  },
+  "colors": {
+    "primary": "main brand color from available colors",
+    "secondary": "secondary color",
+    "accent": "accent color",
+    "background": "background color (lightest)",
+    "surface": "surface color",
+    "error": "error state color (reddish)",
+    "warning": "warning state color (yellowish/orange)",
+    "success": "success state color (greenish)",
+    "text": {
+      "primary": "main text color (darkest)",
+      "secondary": "secondary text color",
+      "muted": "muted text color",
+      "onPrimary": "text on primary color (light)"
+    }
+  }
+}
+
+Use ONLY colors from the available colors list. Choose the most appropriate semantic mapping.`;
+
+        try {
+          const completion = await openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            messages: [{ role: 'user', content: analysisPrompt }],
+            response_format: { type: 'json_object' },
+            temperature: 0.7,
+          });
+
+          const aiAnalysisRaw = completion.choices[0]?.message?.content;
+          if (aiAnalysisRaw) {
+            const aiAnalysis = JSON.parse(aiAnalysisRaw);
+            
+            // Update brand voice in the result
+            if (aiAnalysis.voice) {
+              result.site.brandVoice = {
+                tone: aiAnalysis.voice.tone || 'Professional',
+                personality: aiAnalysis.voice.personality || 'Reliable',
+                keyPhrases: [aiAnalysis.voice.examples?.cta || 'Get Started'],
+                exampleHeadline: aiAnalysis.voice.examples?.headline || page.headings[0] || 'Welcome',
+              };
+            }
+
+            // Store AI analysis for brand kit transformation
+            result.aiAnalysis = aiAnalysis;
+          }
+        } catch (aiError) {
+          console.error('AI analysis error:', aiError);
+          // Continue without AI analysis
+        }
       }
 
       return NextResponse.json(result);
