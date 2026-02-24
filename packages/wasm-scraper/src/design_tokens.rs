@@ -4,7 +4,7 @@ use regex::Regex;
 use std::collections::HashMap;
 use wasm_bindgen::JsValue;
 
-pub fn extract_design_tokens(document: &Html, html: &str) -> Result<DesignTokens, JsValue> {
+pub fn extract_design_tokens(document: &Html, _html: &str) -> Result<DesignTokens, JsValue> {
     let mut tokens = DesignTokens::default();
     
     // Extract from style tags

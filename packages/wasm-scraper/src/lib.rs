@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet, VecDeque};
 use wasm_bindgen::prelude::*;
 
 mod parser;
@@ -21,7 +20,7 @@ pub struct ScraperConfig {
     summarize_brand: Option<bool>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct PageData {
     url: String,
@@ -34,14 +33,14 @@ pub struct PageData {
     assets: AssetData,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct LinkData {
     internal: Vec<String>,
     external: Vec<String>,
 }
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DesignTokens {
     colors: Vec<ColorToken>,
@@ -59,7 +58,7 @@ pub struct ColorToken {
     count: usize,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct AssetData {
     logos: Vec<String>,
