@@ -1,0 +1,17 @@
+{
+  "name": "@rustscrapr/ai",
+  "version": "1.0.0",
+  "description": "AI-powered brand and design analysis",
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "test": "echo \"No tests yet\""
+  },
+  "dependencies": {
+    "openai": "^4.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
