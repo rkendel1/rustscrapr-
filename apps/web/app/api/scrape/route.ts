@@ -56,7 +56,18 @@ export async function POST(request: NextRequest) {
         'Upgrade-Insecure-Requests': '1',
         'Referer': 'https://www.google.com/',
       });
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
+      // Use a more lenient wait strategy to avoid timeouts
+      // Try domcontentloaded first, then fall back to load
+      try {
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 90000 });
+      } catch (error) {
+        // If domcontentloaded fails, try with just 'load'
+        console.warn('domcontentloaded failed, retrying with load:', error);
+        await page.goto(url, { waitUntil: 'load', timeout: 90000 });
+      }
+      
+      // Wait a bit for dynamic content to load
+      await page.waitForTimeout(2000);
       const html = await page.content();
       await browser.close();
 
