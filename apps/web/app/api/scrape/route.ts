@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         'Upgrade-Insecure-Requests': '1',
         'Referer': 'https://www.google.com/',
       });
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
+      await page.goto(url, { waitUntil: 'networkidle0', timeout: 60000 });
       const html = await page.content();
       await browser.close();
 
