@@ -12,7 +12,8 @@ async function ensureWasmInit() {
       // Load the WASM file directly from the package
       const wasmPath = join(process.cwd(), '..', '..', 'packages', 'wasm-scraper', 'pkg', 'wasm_scraper_bg.wasm');
       const wasmBuffer = await readFile(wasmPath);
-      await init(wasmBuffer);
+      // Use object parameter instead of deprecated buffer-only parameter
+      await init({ module_or_path: wasmBuffer });
       wasmInitialized = true;
     } catch (error) {
       console.error('Failed to initialize WASM:', error);
