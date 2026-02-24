@@ -1,4 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import init, { scrape } from 'wasm-scraper';
+
+// Initialize WASM module
+let wasmInitialized = false;
+async function ensureWasmInit() {
+  if (!wasmInitialized) {
+    await init();
+    wasmInitialized = true;
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,59 +37,11 @@ export async function POST(request: NextRequest) {
 
     const html = await response.text();
 
-    // For now, return a mock response until WASM is integrated
-    // TODO: Integrate WASM scraper module
-    const mockResult = {
-      pages: [
-        {
-          url,
-          title: 'Sample Title',
-          metaDescription: 'Sample meta description',
-          headings: ['Heading 1', 'Heading 2'],
-          textContent: html.substring(0, 500),
-          links: {
-            internal: [],
-            external: [],
-          },
-          designTokens: config.extractDesignTokens ? {
-            colors: [
-              { value: '#000000', count: 5 },
-              { value: '#ffffff', count: 3 },
-            ],
-            fontFamilies: ['Arial', 'sans-serif'],
-            fontSizes: ['16px', '14px'],
-            spacing: ['10px', '20px'],
-            borderRadius: ['4px'],
-            shadows: ['0 2px 4px rgba(0,0,0,0.1)'],
-          } : undefined,
-          assets: {
-            logos: [],
-            images: [],
-            favicon: undefined,
-            ogImage: undefined,
-          },
-        },
-      ],
-      site: {
-        designTokens: config.extractDesignTokens ? {
-          colors: [
-            { value: '#000000', count: 5 },
-            { value: '#ffffff', count: 3 },
-          ],
-          fontFamilies: ['Arial', 'sans-serif'],
-          fontSizes: ['16px', '14px'],
-          spacing: ['10px', '20px'],
-          borderRadius: ['4px'],
-          shadows: ['0 2px 4px rgba(0,0,0,0.1)'],
-        } : undefined,
-        allLinks: {
-          internal: [],
-          external: [],
-        },
-      },
-    };
+    // Initialize and use WASM scraper
+    await ensureWasmInit();
+    const result = await scrape(html, url, config || {});
 
-    return NextResponse.json(mockResult);
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Scrape error:', error);
     return NextResponse.json(
