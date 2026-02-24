@@ -228,19 +228,19 @@ function getBrightness(color: string): number {
 }
 
 function findLightestColor(colors: string[]): string | undefined {
-  return colors.sort((a, b) => getBrightness(b) - getBrightness(a))[0];
+  return [...colors].sort((a, b) => getBrightness(b) - getBrightness(a))[0];
 }
 
 function findSecondLightestColor(colors: string[]): string | undefined {
-  return colors.sort((a, b) => getBrightness(b) - getBrightness(a))[1];
+  return [...colors].sort((a, b) => getBrightness(b) - getBrightness(a))[1];
 }
 
 function findDarkestColor(colors: string[]): string | undefined {
-  return colors.sort((a, b) => getBrightness(a) - getBrightness(b))[0];
+  return [...colors].sort((a, b) => getBrightness(a) - getBrightness(b))[0];
 }
 
 function findSecondDarkestColor(colors: string[]): string | undefined {
-  return colors.sort((a, b) => getBrightness(a) - getBrightness(b))[1];
+  return [...colors].sort((a, b) => getBrightness(a) - getBrightness(b))[1];
 }
 
 function findMutedColor(colors: string[]): string | undefined {
