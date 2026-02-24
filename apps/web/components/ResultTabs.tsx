@@ -1,23 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ScraperResult } from '@/types';
 import { DesignTokensDisplay } from './DesignTokensDisplay';
+import { BrandKitDisplay } from './BrandKitDisplay';
+import { transformToBrandKit } from '@/lib/brandKitTransformer';
 
 interface ResultTabsProps {
   result: ScraperResult;
 }
 
 export function ResultTabs({ result }: ResultTabsProps) {
-  const [activeTab, setActiveTab] = useState<'content' | 'links' | 'design' | 'assets'>('design');
+  const [activeTab, setActiveTab] = useState<'brandkit' | 'content' | 'links' | 'design' | 'assets'>('brandkit');
 
   const page = result.pages[0];
   const siteTokens = result.site?.designTokens;
 
+  // Transform to brand kit format
+  const brandKit = useMemo(() => {
+    if (!siteTokens) return null;
+    try {
+      return transformToBrandKit(result, (result as any).aiAnalysis);
+    } catch (e) {
+      console.error('Failed to transform to brand kit:', e);
+      return null;
+    }
+  }, [result, siteTokens]);
+
   const tabs = [
+    { id: 'brandkit' as const, label: 'Brand Kit', icon: '🎨' },
     { id: 'content' as const, label: 'Content', icon: '📄' },
     { id: 'links' as const, label: 'Links', icon: '🔗' },
-    { id: 'design' as const, label: 'Design Tokens', icon: '🎨' },
+    { id: 'design' as const, label: 'Design Tokens', icon: '🔧' },
     { id: 'assets' as const, label: 'Assets', icon: '🖼️' },
   ];
 
@@ -45,6 +59,18 @@ export function ResultTabs({ result }: ResultTabsProps) {
       </div>
 
       <div className="space-y-6">
+        {activeTab === 'brandkit' && (
+          <div>
+            {brandKit ? (
+              <BrandKitDisplay brandKit={brandKit} />
+            ) : (
+              <div className="text-center py-12 bg-slate-50 rounded-lg">
+                <p className="text-slate-600">Brand Kit generation requires design tokens to be extracted.</p>
+              </div>
+            )}
+          </div>
+        )}
+
         {activeTab === 'content' && (
           <div className="space-y-4">
             <div>

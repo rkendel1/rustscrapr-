@@ -6,11 +6,13 @@ mod parser;
 mod design_tokens;
 mod links;
 mod assets;
+mod color_utils;
 
 use parser::extract_text;
 use design_tokens::extract_design_tokens;
 use links::extract_links;
 use assets::extract_assets;
+use color_utils::{extract_typography, extract_text_colors};
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -51,6 +53,26 @@ pub struct DesignTokens {
     spacing: Vec<String>,
     border_radius: Vec<String>,
     shadows: Vec<String>,
+    typography: Typography,
+    text_colors: TextColors,
+}
+
+#[derive(Serialize, Default, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Typography {
+    heading_font: String,
+    heading_fallbacks: Vec<String>,
+    body_font: String,
+    body_fallbacks: Vec<String>,
+}
+
+#[derive(Serialize, Default, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct TextColors {
+    muted: Option<String>,
+    on_primary: Option<String>,
+    primary: Option<String>,
+    secondary: Option<String>,
 }
 
 #[derive(Serialize, Clone)]
@@ -81,6 +103,16 @@ pub struct ScraperResult {
 pub struct SiteData {
     design_tokens: Option<DesignTokens>,
     all_links: LinkData,
+    brand_voice: Option<BrandVoice>,
+}
+
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct BrandVoice {
+    tone: String,
+    personality: String,
+    key_phrases: Vec<String>,
+    example_headline: String,
 }
 
 // Aggregate design tokens from multiple pages
@@ -188,12 +220,14 @@ fn aggregate_design_tokens(pages: &[PageData]) -> Option<DesignTokens> {
         .collect();
 
     Some(DesignTokens {
-        colors: aggregated_colors,
-        font_families: aggregated_font_families,
+        colors: aggregated_colors.clone(),
+        font_families: aggregated_font_families.clone(),
         font_sizes: aggregated_font_sizes,
         spacing: aggregated_spacing,
         border_radius: aggregated_border_radius,
         shadows: aggregated_shadows,
+        typography: extract_typography(&aggregated_font_families),
+        text_colors: extract_text_colors(&aggregated_colors),
     })
 }
 
@@ -213,6 +247,7 @@ pub async fn scrape(html: String, base_url: String, config: JsValue) -> Result<J
         site: SiteData {
             design_tokens: site_design_tokens,
             all_links: page_data.links.clone(),
+            brand_voice: None, // Will be populated by the API route with AI
         },
     };
 

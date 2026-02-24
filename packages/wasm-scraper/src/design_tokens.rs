@@ -1,4 +1,5 @@
 use crate::{DesignTokens, ColorToken};
+use crate::color_utils::{extract_typography as extract_typography_util, extract_text_colors as extract_text_colors_util};
 use scraper::{Html, Selector};
 use regex::Regex;
 use std::collections::HashMap;
@@ -76,6 +77,12 @@ pub fn extract_design_tokens(document: &Html) -> Result<DesignTokens, JsValue> {
     
     // Extract shadows
     tokens.shadows = extract_shadows(&css_content);
+
+    // Extract typography using shared utility
+    tokens.typography = extract_typography_util(&tokens.font_families);
+
+    // Extract text colors using shared utility
+    tokens.text_colors = extract_text_colors_util(&tokens.colors);
 
     Ok(tokens)
 }
