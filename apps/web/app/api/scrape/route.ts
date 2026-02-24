@@ -51,6 +51,22 @@ export async function POST(request: NextRequest) {
     await ensureWasmInit();
     const result = await scrape(html, url, config || {});
 
+    // Brand analysis with OpenAI
+    if (process.env.OPENAI_API_KEY) {
+      const OpenAI = (await import('openai')).default;
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+      const prompt = `Analyze the following scraped webpage data for brand mentions, key products, and marketing insights: ${JSON.stringify(result)}`;
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }],
+      });
+      const analysis = completion.choices[0]?.message?.content || 'No analysis available.';
+      result.brandAnalysis = analysis;
+    } else {
+      result.brandAnalysis = 'OpenAI API key not configured.';
+    }
+
     return NextResponse.json(result);
   } catch (error) {
     console.error('Scrape error:', error);
