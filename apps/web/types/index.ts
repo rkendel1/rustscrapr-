@@ -135,6 +135,30 @@ export interface BrandKitVoice {
   };
 }
 
+// Startups.rip data types
+export interface StartupEntry {
+  name: string;
+  url: string | null;
+  slug: string | null;
+  description: string | null;
+  foundedYear: string | null;
+  shutdownDate: string | null;
+  totalFunding: string | null;
+  industry: string | null;
+  location: string | null;
+  employeeCount: string | null;
+  reasonForShutdown: string | null;
+  tags: string[];
+  sourceUrl: string;
+}
+
+export interface StartupsRipResult {
+  scrapedAt: string;
+  totalStartups: number;
+  pagesScraped: number;
+  startups: StartupEntry[];
+}
+
 export interface BrandKit {
   _id?: string;
   _creationTime?: number;

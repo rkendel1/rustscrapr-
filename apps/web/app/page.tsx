@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ScraperForm } from '@/components/ScraperForm';
 import { ResultTabs } from '@/components/ResultTabs';
+import { StartupsRipScraper } from '@/components/StartupsRipScraper';
 import { ScraperResult } from '@/types';
 
 export default function Home() {
@@ -99,6 +100,11 @@ export default function Home() {
               <ResultTabs result={result} />
             </div>
           )}
+        </div>
+
+        {/* startups.rip dedicated scraper */}
+        <div className="mt-10 bg-white rounded-lg shadow-lg p-6">
+          <StartupsRipScraper />
         </div>
       </div>
     </div>
